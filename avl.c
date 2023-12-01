@@ -137,4 +137,5 @@ int main() {
     return 0;
 }
 
-
+//input: 6 7 8
+//input: 8 4 2
