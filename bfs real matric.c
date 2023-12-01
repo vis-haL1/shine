@@ -1,110 +1,92 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdbool.h>
-#define MAX_VERTICES 100
+#define MAX_VERTICES 20
 
-struct Node {
-    int data;
-    struct Node* next;
-};
+int graph[MAX_VERTICES][MAX_VERTICES];
+bool visited[MAX_VERTICES];
+int queue[MAX_VERTICES];
+int front = -1, rear = -1;
 
-struct Graph {
-    struct Node* adjList[MAX_VERTICES];
-};
-
-struct Node* createNode(int data) {
-    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
-    newNode->data = data;
-    newNode->next = NULL;
-    return newNode;
-}
-
-struct Graph* createGraph() {
-    struct Graph* graph = (struct Graph*)malloc(sizeof(struct Graph));
-    for (int i = 0; i < MAX_VERTICES; ++i) {
-        graph->adjList[i] = NULL;
-    }
-    return graph;
-}
-
-void addEdge(struct Graph* graph, int src, int dest) {
-    struct Node* newNode = createNode(dest);
-    newNode->next = graph->adjList[src];
-    graph->adjList[src] = newNode;
-}
-
-void bfsAdjacencyList(struct Graph* graph, int start) {
-    bool visited[MAX_VERTICES] = {false};
-    int queue[MAX_VERTICES];
-    int front = 0, rear = 0;
-
-    queue[rear++] = start;
-    visited[start] = true;
-
-    printf("BFS Traversal: ");
-    while (front < rear) {
-        int vertex = queue[front++];
-        printf("%d ", vertex);
-
-        struct Node* neighborNode = graph->adjList[vertex];
-        while (neighborNode) {
-            int neighbor = neighborNode->data;
-            if (!visited[neighbor]) {
-                queue[rear++] = neighbor;
-                visited[neighbor] = true;
-            }
-            neighborNode = neighborNode->next;
+void initializeGraph(int vertices) {
+    for (int i = 0; i < vertices; ++i) {
+        visited[i] = false;
+        for (int j = 0; j < vertices; ++j) {
+            graph[i][j] = 0;
         }
     }
-    printf("\n");
+}
+
+void addEdge(int source, int destination) {
+    graph[source][destination] = 1;
+    graph[destination][source] = 1; // For undirected graph
+}
+
+void displayAdjacencyMatrix(int vertices) {
+    printf("\nAdjacency Matrix Representation:\n");
+    for (int i = 0; i < vertices; ++i) {
+        for (int j = 0; j < vertices; ++j) {
+            printf("%d ", graph[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+void bfs(int vertex, int vertices) {
+    visited[vertex] = true;
+    queue[++rear] = vertex;
+
+    while (front <= rear) {
+        int current = queue[front++];
+        printf("%d ", current);
+
+        for (int i = 0; i < vertices; ++i) {
+            if (graph[current][i] && !visited[i]) {
+                visited[i] = true;
+                queue[++rear] = i;
+            }
+        }
+    }
+}
+
+void dfs(int vertex, int vertices) {
+    visited[vertex] = true;
+    printf("%d ", vertex);
+
+    for (int i = 0; i < vertices; ++i) {
+        if (graph[vertex][i] && !visited[i]) {
+            dfs(i, vertices);
+        }
+    }
 }
 
 int main() {
-    int numVertices, numEdges;
+    int vertices, edges, source, destination;
 
     printf("Enter the number of vertices: ");
-    scanf("%d", &numVertices);
-
-    struct Graph* graph = createGraph();
-
+    scanf("%d", &vertices);
     printf("Enter the number of edges: ");
-    scanf("%d", &numEdges);
+    scanf("%d", &edges);
 
-    printf("Enter the edges (src dest):\n");
-    for (int i = 0; i < numEdges; ++i) {
-        int src, dest;
-        scanf("%d %d", &src, &dest);
-        addEdge(graph, src, dest);
+    initializeGraph(vertices);
+
+    printf("Enter the edges (source destination):\n");
+    for (int i = 0; i < edges; ++i) {
+        scanf("%d %d", &source, &destination);
+        addEdge(source, destination);
     }
 
-    int startVertex;
-    printf("Enter the starting vertex for BFS: ");
-    scanf("%d", &startVertex);
+    displayAdjacencyMatrix(vertices);
 
-    printf("Adjacency List:\n");
-    for (int i = 0; i < numVertices; ++i) {
-        struct Node* current = graph->adjList[i];
-        printf("%d: ", i);
-        while (current) {
-            printf("%d -> ", current->data);
-            current = current->next;
-        }
-        printf("NULL\n");
+    printf("\nBFS Traversal starting from vertex 0: ");
+    bfs(0, vertices);
+
+    // Reset visited array for DFS
+    for (int i = 0; i < vertices; ++i) {
+        visited[i] = false;
     }
 
-    printf("BFS traversal starting from vertex %d:\n", startVertex);
-    bfsAdjacencyList(graph, startVertex);
-
-    for (int i = 0; i < numVertices; ++i) {
-        struct Node* current = graph->adjList[i];
-        while (current) {
-            struct Node* temp = current;
-            current = current->next;
-            free(temp);
-        }
-    }
-    free(graph);
+    printf("\nDFS Traversal starting from vertex 0: ");
+    dfs(0, vertices);
 
     return 0;
 }
-
