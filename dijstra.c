@@ -102,3 +102,13 @@ int main() {
     return 0;
 }
 
+/*INPUT v-5 e-7
+    Enter edge 1 (source, destination, weight): 0 1 4
+Enter edge 2 (source, destination, weight): 0 2 8
+Enter edge 3 (source, destination, weight): 1 2 2
+Enter edge 4 (source, destination, weight): 1 3 5
+Enter edge 5 (source, destination, weight): 2 3 5
+Enter edge 6 (source, destination, weight): 2 4 9
+Enter edge 7 (source, destination, weight): 3 4 4
+    */
+
